@@ -1,0 +1,80 @@
+body{
+    margin:0;
+    padding:0;
+    text-align:left;
+    font-size: 32px;
+    max-width: 1200px;
+	margin: 0 auto;
+}
+header{
+    background-color: #fff;
+    border-bottom: 1px solid #ccc;
+    text-align: center;
+}
+main{
+    border-bottom:1px solid #ccc;
+}
+footer{
+    background-color: #fff;
+    border-bottom:1px solid #ccc;
+    text-align: center;
+}
+p{
+    font-size:200%;
+    text-align: center;
+    border-bottom:1px solid #fff;
+    height:200px;
+}
+ul{
+    padding: 0;
+    border-top: 1px solid #000000;
+    display:table;  /* 定義 */
+    table-layout: fixed;
+    width:100%;
+}
+li{
+    text-align: center;
+    list-style-type:none;
+    border: 1px solid #666;
+    background-color: #FFF;
+    display:table-cell;  /* 定義 */
+    cursor: pointer;
+}
+li:hover{
+    background: #0066CC;
+    color:#fff;
+}
+/*  イケメンコンテナ*/
+.ikemen_container{
+    display: flex;
+}
+/* イケメン画像 */
+.ikemen{
+    display: flex;
+    flex-direction: column;
+    justify-content: left;
+    width: 100%;
+}
+/* 勝敗の表示 */
+.juge{
+    display: flex;
+flex-direction: column;
+justify-content: center;
+width: 100%;
+}
+/* コンピュータの手 */
+.cmpHandImg{
+display: flex;
+flex-direction: column;
+justify-content: right;
+width: 100%;
+}
+.text{
+font-size: 20px;
+}
+#ikeShoot{
+    border: 1px solid gray;
+}
+#ikeButton{
+    border: 1px solid gray;
+}

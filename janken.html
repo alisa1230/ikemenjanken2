@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/sample.css">
+  <title>イケメンじゃんけんver.2</title>
+</head>
+
+<body>
+  <header>
+    <h1>イケメン後出しじゃんけんver.2</h1>
+  </header>
+
+  <!-- イケメン画像を表示 -->
+  <div class="ikemen_container">
+    <div class="ikemen">
+      <img id="ikemen" src="img/横浜流星.png" onclick="ikemen_click();">
+      <p class="text"><br>画像をクリックして手を選んでください</p>
+    </div>
+    <!-- 勝ち負けを表示 -->
+    <div class="juge" id="juge">
+      <p class="text">勝敗</p>
+    </div>
+    <!-- コンピュターの手を表示 -->
+    <div class="cmpHandImg">
+      <img id="cmpHandImg" src="img/グー.png" value="0" width="500" height="500">
+      <p class="text"><br>コンピューターの出し手</p>
+    </div>
+  </div>
+  <div>
+    <!-- カメラ が描画されます -->
+    <video id="myVideo" width="400" height="300" autoplay="1"></video>
+    <button id="start">カシャ</button>
+    <h2>Canvas</h2>
+    <canvas id="canvas"></canvas>
+  </div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="janken.js"></script>
+  <script>
+    //PC側のじゃんけんメソッドクラス？を呼び出す
+    janken();
+
+
+    //配列にイケメン画像を詰める
+    const ikemen_img = new Array("img/横浜流星.png", "img/賀来賢人.png", "img/吉沢亮.png", "img/窪田正孝.png", "img/坂口健太郎.png",
+      "img/山崎賢人.jpg", "img/新田真剣佑.png", "img/竹内涼真.png", "img/中村倫也.png", "img/田中圭.png", "img/nissy.png");
+
+    var count = -1;
+    //タイマー停止用の宣言
+    var ikemenTimer;
+    //タイマーメソッド呼び出し
+    starTimer();
+
+    // このメソッドは配列の画像をループするメソッドです
+    function starTimer() {
+      //画像の枚数確認
+      if (count == 10) {
+        count = 0;
+      } else {
+        count++;
+      }
+      //画像出力
+      document.getElementById("ikemen").src = ikemen_img[count];
+      //次のタイマー呼びだし
+      ikemenTimer = setTimeout("starTimer()", 300);
+    }
+
+    //このメソッドは画像をクリックした際にタイマーが停止し、じゃんけんの勝敗を出力するメソッドです
+    function ikemen_click() {
+      //タイマーの停止
+      clearTimeout(ikemenTimer);
+      //イケメン画像のインデックスを代入
+      const ikemen_No = [count];
+      // console.log(ikemen_img[count]);
+      // コンピュータの出し手valueを取得し代入する
+      var cmpHandImg = document.getElementById("cmpHandImg");
+      const cmpHand = cmpHandImg.value;
+      var juge = document.getElementById("juge");
+
+      // TODO もっと簡単なif文を作る*優先度低
+      // イケメンインデックスを３で割余が0またはイケメンインデックス0の時（イケメン：グー）
+      if (ikemen_No % 3 == 0 || ikemen_No == 0) {
+        //コンピュータ：チョキ
+        if (cmpHand == 1) {
+          juge.innerHTML = "勝ち";
+          ikemenShoot();
+        } else {
+
+          juge.innerHTML = "負けちゃった！もう一度リロードしてね";
+        }
+      }
+      // イケメンインデックスを３で割余が1またはイケメンインデックス1の時（イケメン：チョキ）
+      if (ikemen_No % 3 == 1 || ikemen_No == 1) {
+        //コンピュータ：パー
+        if (cmpHand == 2) {
+          juge.innerHTML = "勝ち";
+          ikemenShoot();
+
+        } else {
+          juge.innerHTML = "負けちゃった！もう一度リロードしてね";
+        }
+      }
+      // イケメンインデックスを３で割余が1またはイケメンインデックス1の時（イケメン：パー）
+      if (ikemen_No % 3 == 2 || ikemen_No == 2) {
+        //コンピュータ：グー
+        if (cmpHand == 0) {
+          juge.innerHTML = "勝ち";
+          ikemenShoot();
+        } else {
+          juge.innerHTML = "負けちゃった！もう一度リロードしてね";
+        }
+      }
+
+      //イケショット！！じゃんけんで勝ったらイケメンと写真が取れるメソッドです
+      function ikemenShoot() {
+        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || window.navigator.mozGetUserMedia;
+        window.URL = window.URL || window.webkitURL;
+
+        var video = document.getElementById('myVideo');
+        var localStream = null;
+        navigator.getUserMedia({ video: true },
+          function (stream) { // for success case
+            // video.src = window.URL.createObjectURL(stream);chromeでは使えない
+            video.srcObject = stream;
+          },
+          function (err) { // for error case
+            console.log(err);
+          }
+        );
+
+        //カメラ の画像をキャンパスに表示するメソッドです
+        document.querySelector("#start").addEventListener("click", () => {
+          var background = new Image();
+          background.src = ikemen_img[count];
+          console.log(ikemen_img[count]);
+
+          var canvas = document.getElementById('canvas');
+          //canvasの描画モードを2sに
+          var ctx = canvas.getContext('2d');
+
+          //videoの縦幅横幅を取得
+          var w = video.offsetWidth;
+          var h = video.offsetHeight;
+
+          //同じサイズをcanvasに指定
+          canvas.setAttribute("width", w);
+          canvas.setAttribute("height", h);
+
+          //クリックした画像を取得しcanvasに表示させる
+          var image2 = new Image();
+          image2.src = ikemen_img[count];
+          image2.addEventListener('load', function () {
+            ctx.drawImage(image2, 0, 0, w, h);
+          }, false);
+          //カメラ をcanvasに表示させる
+          ctx.drawImage(video, 0, 0, w, h);
+          //取得したイケメンのパスをオブジェクトに詰める
+          const ikeimg = ikemen_img[count];
+          const ikemenObj = {
+            "name": ikeimg
+          }
+          //オブジェクとをjasonに変換しloacalstrageに詰める
+          const jsonData = JSON.stringify(ikemenObj);// dataをjson形式に変換
+          localStorage.setItem('ikemenData', jsonData); // json形式で保
+          //ToDojsonDataがついかできるようにする。
+          document.getElementById("ikegallary").src = ikemen_img[count];
+
+          //2.clear クリックイベント
+          $('#clear').on('click', function () {
+            localStorage.removeItem('ikemenData');
+            document.getElementById("ikegallary").src = ""
+          });
+          //3.ページ読み込み：保存データ取得表示
+          // なぜかこのメソッドがすぐによびだされる。。
+          // if (localStorage.getItem('ikemenData')) {
+          //   const jsonGet = localStorage.getItem('ikemenData');// データ取得 
+          //   const jsonToObj = JSON.parse(jsonGet); // json形式から戻す 
+          //   console.log(jsonToObj.name)
+          // document.getElementById("ikegallary").src = "jsonToObj.name"
+        });
+      }
+
+    }
+  </script>
+
+</body>
+<h3>一緒にとったイケメンたち</h3>
+<img id="ikegallary" src="" alt="">
+<button id="clear">クリア</button>
+
+</html>
